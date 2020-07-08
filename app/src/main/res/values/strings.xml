@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Duck Hunt</string>
+    <string name="enter_nick">Ingresa un Nick</string>
+    <string name="start_game">Empezar Juego</string>
+    <string name="_0">0</string>
+    <string name="_60s">60s</string>
+</resources>
