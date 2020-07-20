@@ -1,26 +1,35 @@
 package com.luisg.duckhunt
 
 import android.content.DialogInterface
+import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.util.DisplayMetrics
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_game.*
 
 
 class GameActivity : AppCompatActivity() {
 
+
     private var counter = 0
     private var screenHeight = 0
-    private var screenWidht = 0
+    private var screenWidth = 0
     private var isGameOver = false
+    private lateinit var idUsers: String
+    private lateinit var db: FirebaseFirestore
+    //private val intentRanking = Intent(this, RankingActivity::class.java)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
+        db = FirebaseFirestore.getInstance()
         events()
         initScreen()
         initCountDownTime()
@@ -38,8 +47,13 @@ class GameActivity : AppCompatActivity() {
                 txtTime.text = "0s"
                 isGameOver = true
                 showDialogGameOver()
+                saveResultFirestore()
             }
         }.start()
+    }
+
+    private fun saveResultFirestore() {
+        db.collection("users").document(idUsers).update("ducks",counter)
     }
 
     private fun showDialogGameOver() {
@@ -57,10 +71,10 @@ class GameActivity : AppCompatActivity() {
                     initCountDownTime()
                     moveDuck()
                 })
-            setNegativeButton("Cancelar",
+            setNegativeButton("Ver Ranking",
                 DialogInterface.OnClickListener { dialog, id ->
                     dialog.dismiss()
-                    finish()
+                    showRanking()
                 })
         }
 
@@ -68,20 +82,28 @@ class GameActivity : AppCompatActivity() {
         dialog?.show()
     }
 
+    private fun showRanking() {
+        startActivity(Intent(this,RankingActivity::class.java))
+    }
+
+
     private fun initScreen() {
         //1. Obtener el tamaño de la pantalla del dispositivo
         val metrics = DisplayMetrics()
         this.windowManager.defaultDisplay.getMetrics(metrics)
         screenHeight = metrics.heightPixels
-        screenWidht = metrics.widthPixels
+        screenWidth = metrics.widthPixels
     }
 
     private fun events() {
         val nick = intent.extras?.getString("nick")
+        idUsers = intent.extras?.getString("id")!!
         txtNickName.text = nick
 
         imageDuck.setOnClickListener {
             if (!isGameOver) {
+                val shooter = MediaPlayer.create(this, R.raw.tiro_scopeta)
+                shooter.start()
                 counter++
                 txtCounterDuck.text = counter.toString()
                 imageDuck.setImageResource(R.drawable.duck_clicked)
@@ -96,7 +118,7 @@ class GameActivity : AppCompatActivity() {
     private fun moveDuck() {
         val min = 0
         val maxHeight = screenHeight - imageDuck.height
-        val maxWidth = screenWidht - imageDuck.width
+        val maxWidth = screenWidth - imageDuck.width
 
         //Generenado coordenadas aleatorias.
         val coordX = (min..maxWidth).random()
@@ -106,8 +128,4 @@ class GameActivity : AppCompatActivity() {
         imageDuck.x = coordX.toFloat()
         imageDuck.y = coordY.toFloat()
     }
-}
-
-private fun Handler.postDelayed(runnable: Runnable): Any {
-    TODO("Not yet implemented")
 }

@@ -4,4 +4,5 @@
     <string name="start_game">Empezar Juego</string>
     <string name="_0">0</string>
     <string name="_60s">60s</string>
+    <string name="top_ranking_score">Top Ranking Score</string>
 </resources>
