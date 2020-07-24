@@ -1,14 +1,12 @@
 package com.luisg.duckhunt
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.auth.User
 import com.luisg.duckhunt.model.RankingAdapter
 import com.luisg.duckhunt.model.Users
 import kotlinx.android.synthetic.main.activity_ranking.*
@@ -43,9 +41,6 @@ class RankingActivity : AppCompatActivity() {
                 userList = ArrayList<Users>()
 
                 for (document in documents){
-
-                    Log.d("TAG_FIRESTORE", "${document.id} => ${document.data}")
-
                     val userItem = document.toObject(Users::class.java)
                     userList.add(userItem)
                 }
@@ -54,8 +49,5 @@ class RankingActivity : AppCompatActivity() {
             .addOnFailureListener { exception ->
                 Toast.makeText(this, "Error: $exception", Toast.LENGTH_LONG).show()
             }
-
-
-
     }
 }

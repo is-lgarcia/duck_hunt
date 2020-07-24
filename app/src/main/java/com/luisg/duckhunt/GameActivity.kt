@@ -22,7 +22,7 @@ class GameActivity : AppCompatActivity() {
     private var isGameOver = false
     private lateinit var idUsers: String
     private lateinit var db: FirebaseFirestore
-    //private val intentRanking = Intent(this, RankingActivity::class.java)
+    var shooter: MediaPlayer? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +30,7 @@ class GameActivity : AppCompatActivity() {
         setContentView(R.layout.activity_game)
 
         db = FirebaseFirestore.getInstance()
+
         events()
         initScreen()
         initCountDownTime()
@@ -95,21 +96,26 @@ class GameActivity : AppCompatActivity() {
         screenWidth = metrics.widthPixels
     }
 
+
+
     private fun events() {
         val nick = intent.extras?.getString("nick")
         idUsers = intent.extras?.getString("id")!!
         txtNickName.text = nick
 
         imageDuck.setOnClickListener {
+            imageDuck.isClickable = false
             if (!isGameOver) {
-                val shooter = MediaPlayer.create(this, R.raw.tiro_scopeta)
-                shooter.start()
+                shooter = MediaPlayer.create(this, R.raw.duck_sound)
+                shooter?.start()
                 counter++
                 txtCounterDuck.text = counter.toString()
                 imageDuck.setImageResource(R.drawable.duck_clicked)
                 val handler = Handler().postDelayed(Runnable {
                     imageDuck.setImageResource(R.drawable.duck)
                     moveDuck()
+                    shooter?.release()
+                    shooter = null
                 }, 500)
             }
         }
@@ -127,5 +133,6 @@ class GameActivity : AppCompatActivity() {
         //Aplicando las coordenadas en la image
         imageDuck.x = coordX.toFloat()
         imageDuck.y = coordY.toFloat()
+        imageDuck.isClickable = true
     }
 }
